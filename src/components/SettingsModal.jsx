@@ -259,28 +259,35 @@ export default function SettingsModal({ isOpen, onClose }) {
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">
-                  SMTP Username
+                  SMTP Username / Email
                 </label>
                 <input
                   type="text"
                   name="smtp_user"
                   value={settings.smtp_user}
-                  onChange={handleChange}
-                  placeholder="username / api_key"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      smtp_user: val,
+                      smtp_host: !prev.smtp_host && val.endsWith('@gmail.com') ? 'smtp.gmail.com' : prev.smtp_host,
+                    }));
+                  }}
+                  placeholder="username@gmail.com"
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 focus:border-emerald-500 text-xs text-white"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">
-                  SMTP Password
+                  SMTP Password / App Password
                 </label>
                 <input
                   type="password"
                   name="smtp_pass"
                   value={settings.smtp_pass}
                   onChange={handleChange}
-                  placeholder="••••••••"
+                  placeholder="16-char App Password"
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 focus:border-emerald-500 text-xs text-white"
                 />
               </div>
@@ -294,10 +301,14 @@ export default function SettingsModal({ isOpen, onClose }) {
                   name="smtp_from"
                   value={settings.smtp_from}
                   onChange={handleChange}
-                  placeholder="PureGro <noreply@puregro.com>"
+                  placeholder="PureGro <welcome@puregro.com>"
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 focus:border-emerald-500 text-xs text-white"
                 />
               </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-[11px] text-emerald-300/90 leading-relaxed">
+              💡 <strong>Using Gmail?</strong> Google requires a <strong>16-character App Password</strong> (not your standard Google account login password). You can generate one at: <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="underline font-bold text-white hover:text-emerald-200">myaccount.google.com/apppasswords</a>.
             </div>
 
             {settings.smtp_host && (

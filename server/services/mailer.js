@@ -12,16 +12,42 @@ export function getMailerConfig() {
 }
 
 export function createTransporter(settings) {
-  if (!settings.smtp_host || !settings.smtp_user) {
+  let host = (settings.smtp_host || '').trim();
+  const user = (settings.smtp_user || '').trim();
+  const pass = (settings.smtp_pass || '').trim();
+
+  // If user is @gmail.com and host was left blank, auto-set to Gmail SMTP
+  if (!host && user.toLowerCase().endsWith('@gmail.com')) {
+    host = 'smtp.gmail.com';
+  }
+
+  if (!host || !user) {
     return null;
   }
+
+  const port = parseInt(settings.smtp_port, 10) || (host === 'smtp.gmail.com' ? 587 : 587);
+  const isSecure = settings.smtp_secure === 'true' || port === 465;
+
+  if (host === 'smtp.gmail.com' || user.toLowerCase().endsWith('@gmail.com')) {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: user,
+        pass: pass,
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+  }
+
   return nodemailer.createTransport({
-    host: settings.smtp_host,
-    port: parseInt(settings.smtp_port, 10) || 587,
-    secure: settings.smtp_secure === 'true',
+    host: host,
+    port: port,
+    secure: isSecure,
     auth: {
-      user: settings.smtp_user,
-      pass: settings.smtp_pass,
+      user: user,
+      pass: pass,
     },
     tls: {
       rejectUnauthorized: false
