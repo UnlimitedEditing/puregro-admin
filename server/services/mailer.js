@@ -25,21 +25,8 @@ export function createTransporter(settings) {
     return null;
   }
 
-  const port = parseInt(settings.smtp_port, 10) || (host === 'smtp.gmail.com' ? 587 : 587);
+  const port = parseInt(settings.smtp_port, 10) || 587;
   const isSecure = settings.smtp_secure === 'true' || port === 465;
-
-  if (host === 'smtp.gmail.com' || user.toLowerCase().endsWith('@gmail.com')) {
-    return nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: user,
-        pass: pass,
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-  }
 
   return nodemailer.createTransport({
     host: host,
@@ -49,6 +36,9 @@ export function createTransporter(settings) {
       user: user,
       pass: pass,
     },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 10000,
     tls: {
       rejectUnauthorized: false
     }
